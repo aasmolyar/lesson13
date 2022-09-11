@@ -4,7 +4,7 @@ const todoControl = document.querySelector('.todo-control');  //верхняя �
 const headerInput = document.querySelector('.header-input');  //верхний ввод задания
 const todoList = document.querySelector('.todo-list');        // поле введенной задачи
 const todoCompleted = document.querySelector('.todo-completed'); // поле выполненной задачи
-const toDoData = []     // массив всех toDo, формиоуемый при submit формы
+let toDoData = []     // массив всех toDo, формиоуемый при submit формы
 
 const render = function () {
     todoList.innerHTML = ''        //удаляем из HTML поле введенной задачи
@@ -31,6 +31,7 @@ const render = function () {
         li.querySelector('.todo-complete').addEventListener('click', function () { // вешаем слушателя на кнопку выполнено
             item.completed = !item.completed  // при клике меняет значение с false на true
             render()    // вызывает саму себя
+            setJsonToDoDataToLocalStorage()
         })
 
         li.querySelector('.todo-remove').addEventListener('click', function (event) {  // вешаем слушателя на кнопку УДАЛИТЬ  
@@ -42,20 +43,9 @@ const render = function () {
             const liTextContent = clickedLi.textContent  // получили текст li
             console.log('liTextContent', liTextContent)
 
-            toDoData.forEach(function (item, index) {  // перебираем массив ======================================
-                console.log('зашли в перебор массива');
-
-                if (liTextContent === item.text) {  // если текст li = туксту элемента массива
-                    console.log('зашли в if', 'liTextContent = ', liTextContent);
-
-                    const toDoDataIndex = index;   // получаем index элемента
-                    console.log('toDoDataIndex', toDoDataIndex);
-
-                    li.remove()        // Удаляем li
-                    toDoData.splice(toDoDataIndex, 1) // удаляем элемент из массива по индексу  в массиве
-                    console.log('toDoData', toDoData);
-                }
-            })
+            toDoData = toDoData.filter((item) => liTextContent !== item.text);
+            render()
+            setJsonToDoDataToLocalStorage()
         })
     })
 }
@@ -70,50 +60,25 @@ todoControl.addEventListener('submit', function (event) {     //вешаем с�
     if (newToDo.text.trim() != '') { // Проверяем на пустую строку
         toDoData.push(newToDo)  // заносим сщзданный объект в toDoData
         headerInput.value = ''     // заносим в окно ввода пустую строку
-        render()                   // вызываем render
+        render();
+        setJsonToDoDataToLocalStorage();
     }
 })
 
-function setJsonToDoData() {
+function setJsonToDoDataToLocalStorage() {
     localStorage.toDoData = JSON.stringify(toDoData);
 }
-
-todoControl.addEventListener('submit', function (event) {     //вешаем слушателя на форму
-    setJsonToDoData();
-})
 
 function showToDoData() {
     console.log('Страница загрузилась');
     console.log('localStorage', localStorage);
 
-    const li = document.createElement('li')  // создаем новый li
-    li.classList.add('todo-item')            // присваиваем li свойства класса todo-item
-    li.innerHTML = '<span class="text-todo">' + 'text' + '</span>' +   // кладем из свойства toDoData текст
-        '<div class="todo-buttons">' +
-        '<button class="todo-remove"></button>' +   // делаем кнопку удалить
-        '<button class="todo-complete"></button>' + // делаем кнопку завершено
-        '</div>'
+    const localStorageParse = JSON.parse(localStorage.getItem('toDoData'));
+    console.log('localStorageParse', localStorageParse);
+    console.log('localStorageParse.length', localStorageParse.length);
 
-    /*     const localStorageParse = JSON.parse(localStorage.getItem('toDoData'));
-        console.log('localStorageParse', localStorageParse);
-        console.log('localStorageParse.length', localStorageParse.length);
-    
-        for (let item of localStorageParse) {
-    
-            const localStorageParseText = item.text;
-            console.log(localStorageParseText);
-    
-            const localStorageParseCOmpleted = item.completed;
-            console.log(localStorageParseCOmpleted);
-    
-            const li = document.createElement('li')  // создаем новый li
-            li.classList.add('todo-item')            // присваиваем li свойства класса todo-item
-            li.innerHTML = '<span class="text-todo">' + item.text + '</span>' +   // кладем из свойства toDoData текст
-                '<div class="todo-buttons">' +
-                '<button class="todo-remove"></button>' +   // делаем кнопку удалить
-                '<button class="todo-complete"></button>' + // делаем кнопку завершено
-                '</div>'
-        } */
+    toDoData = localStorageParse;
+    render()
 }
 
 document.addEventListener('DOMContentLoaded', showToDoData)
