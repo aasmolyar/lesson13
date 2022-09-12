@@ -18,9 +18,6 @@ const render = function () {
             '<button class="todo-remove"></button>' +   // делаем кнопку удалить
             '<button class="todo-complete"></button>' + // делаем кнопку завершено
             '</div>'
-        console.log(toDoData)
-
-        console.log('toDoData.text', toDoData.text) //////////////////////////////////////////////////////
 
         if (item.completed) {      // если флажок нажат ?????
             todoCompleted.append(li)  // заносим в конец поля выполненной задачи
@@ -35,15 +32,12 @@ const render = function () {
         })
 
         li.querySelector('.todo-remove').addEventListener('click', function (event) {  // вешаем слушателя на кнопку УДАЛИТЬ  
-            console.log('нажали на кнопку удалить');
 
             const clickedLi = event.target.closest('li')  // получаем кликнутый Li
-            console.log('clickedLi', clickedLi)
 
             const liTextContent = clickedLi.textContent  // получили текст li
-            console.log('liTextContent', liTextContent)
 
-            toDoData = toDoData.filter((item) => liTextContent !== item.text);
+            toDoData = toDoData.filter((item) => liTextContent !== item.text); // фильтруем массив 
             render()
             setJsonToDoDataToLocalStorage()
         })
@@ -70,15 +64,13 @@ function setJsonToDoDataToLocalStorage() {
 }
 
 function showToDoData() {
-    console.log('Страница загрузилась');
-    console.log('localStorage', localStorage);
-
     const localStorageParse = JSON.parse(localStorage.getItem('toDoData'));
-    console.log('localStorageParse', localStorageParse);
-    console.log('localStorageParse.length', localStorageParse.length);
 
-    toDoData = localStorageParse;
-    render()
+    if (localStorageParse.length != 0) {
+
+        toDoData = localStorageParse;
+        render()
+    }
 }
 
 document.addEventListener('DOMContentLoaded', showToDoData)
